@@ -1,0 +1,535 @@
+﻿
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Chat Privado</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #101114;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* =========================
+           PANTALLA DE NOMBRE
+        ========================== */
+
+        #login-screen {
+            position: fixed;
+            inset: 0;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background:
+                radial-gradient(circle at top, #252936, #101114 60%);
+        }
+
+        .login-box {
+            width: min(90%, 400px);
+            padding: 35px;
+
+            background: #191b20;
+            border: 1px solid #2d3038;
+            border-radius: 18px;
+
+            text-align: center;
+
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .login-box h1 {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .login-box p {
+            color: #aeb2bd;
+            margin-bottom: 25px;
+        }
+
+        #username {
+            width: 100%;
+            padding: 14px 16px;
+
+            background: #101114;
+            color: white;
+
+            border: 1px solid #343842;
+            border-radius: 10px;
+
+            outline: none;
+            font-size: 16px;
+
+            margin-bottom: 15px;
+        }
+
+        #username:focus {
+            border-color: #666d7c;
+        }
+
+        #enter-button {
+            width: 100%;
+            padding: 14px;
+
+            border: none;
+            border-radius: 10px;
+
+            background: white;
+            color: #111;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        #enter-button:hover {
+            transform: translateY(-2px);
+            background: #e9e9e9;
+        }
+
+
+        /* =========================
+           CHAT
+        ========================== */
+
+        #chat-screen {
+            display: none;
+
+            height: 100vh;
+            width: 100%;
+
+            flex-direction: column;
+        }
+
+        /* CABECERA */
+
+        .chat-header {
+            height: 65px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 20px;
+
+            background: #191b20;
+            border-bottom: 1px solid #2d3038;
+        }
+
+        .chat-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-icon {
+            width: 38px;
+            height: 38px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #292c34;
+            border-radius: 50%;
+        }
+
+        .chat-title h2 {
+            font-size: 18px;
+        }
+
+        .online {
+            font-size: 12px;
+            color: #8e949f;
+        }
+
+        #current-user {
+            color: #c9ccd3;
+            font-size: 14px;
+        }
+
+
+        /* MENSAJES */
+
+        #messages {
+            flex: 1;
+
+            overflow-y: auto;
+
+            padding: 20px;
+
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            background: #101114;
+        }
+
+        .message {
+            max-width: 75%;
+
+            padding: 10px 14px;
+
+            border-radius: 12px;
+
+            background: #20232a;
+
+            align-self: flex-start;
+        }
+
+        .message .name {
+            font-size: 12px;
+            font-weight: bold;
+
+            color: #bfc3cc;
+
+            margin-bottom: 4px;
+        }
+
+        .message .text {
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .message .time {
+            display: block;
+
+            font-size: 10px;
+
+            color: #777c87;
+
+            margin-top: 5px;
+        }
+
+
+        /* ZONA DE ESCRIBIR */
+
+        .message-area {
+            display: flex;
+            gap: 10px;
+
+            padding: 12px 15px;
+
+            background: #191b20;
+            border-top: 1px solid #2d3038;
+        }
+
+        #message-input {
+            flex: 1;
+
+            padding: 13px 15px;
+
+            background: #101114;
+            color: white;
+
+            border: 1px solid #343842;
+            border-radius: 10px;
+
+            outline: none;
+
+            font-size: 15px;
+        }
+
+        #send-button {
+            width: 50px;
+
+            border: none;
+            border-radius: 10px;
+
+            background: white;
+            color: #111;
+
+            font-size: 20px;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        #send-button:hover {
+            transform: scale(1.05);
+        }
+
+
+        /* =========================
+           MÓVIL
+        ========================== */
+
+        @media (max-width: 600px) {
+
+            .login-box {
+                padding: 28px 22px;
+            }
+
+            .chat-header {
+                padding: 0 12px;
+            }
+
+            #messages {
+                padding: 12px;
+            }
+
+            .message {
+                max-width: 85%;
+            }
+
+            #current-user {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================
+         PANTALLA PARA ELEGIR NOMBRE
+    ========================== -->
+
+    <section id="login-screen">
+
+        <div class="login-box">
+
+            <h1>💬 Chat Privado</h1>
+
+            <p>
+                Elige el nombre que aparecerá junto a tus mensajes.
+            </p>
+
+            <input
+                type="text"
+                id="username"
+                maxlength="20"
+                placeholder="Tu nombre..."
+                autocomplete="off"
+            >
+
+            <button id="enter-button">
+                Entrar al chat
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         PANTALLA DEL CHAT
+    ========================== -->
+
+    <main id="chat-screen">
+
+        <!-- CABECERA -->
+
+        <header class="chat-header">
+
+            <div class="chat-title">
+
+                <div class="chat-icon">
+                    💬
+                </div>
+
+                <div>
+                    <h2>Chat Privado</h2>
+
+                    <span class="online">
+                        Chat grupal
+                    </span>
+                </div>
+
+            </div>
+
+            <div id="current-user"></div>
+
+        </header>
+
+
+        <!-- =========================
+     MENSAJES
+========================= -->
+
+<section id="messages">
+
+    <div class="message system-message">
+
+        <div class="name">
+            💬 Sistema
+        </div>
+
+        <div class="text">
+            Bienvenido al chat 👋
+        </div>
+
+    </div>
+
+</section>
+
+
+        <!-- CAJA PARA ESCRIBIR -->
+
+        <form class="message-area" id="message-form">
+
+            <input
+                type="text"
+                id="message-input"
+                placeholder="Escribe un mensaje..."
+                autocomplete="off"
+            >
+
+            <button
+                type="submit"
+                id="send-button"
+                aria-label="Enviar mensaje"
+            >
+                ➤
+            </button>
+
+        </form>
+
+    </main>
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================== -->
+
+    <script>
+
+        const loginScreen = document.getElementById("login-screen");
+        const chatScreen = document.getElementById("chat-screen");
+
+        const usernameInput = document.getElementById("username");
+        const enterButton = document.getElementById("enter-button");
+
+        const currentUser = document.getElementById("current-user");
+
+        const messageForm = document.getElementById("message-form");
+        const messageInput = document.getElementById("message-input");
+        const messages = document.getElementById("messages");
+
+
+        let username = "";
+
+
+        /* =========================
+           ENTRAR AL CHAT
+        ========================== */
+
+        function enterChat() {
+
+            const name = usernameInput.value.trim();
+
+            if (name === "") {
+                usernameInput.focus();
+                return;
+            }
+
+            username = name;
+
+            currentUser.textContent = "👤 " + username;
+
+            loginScreen.style.display = "none";
+            chatScreen.style.display = "flex";
+
+            messageInput.focus();
+        }
+
+
+        enterButton.addEventListener("click", enterChat);
+
+
+        usernameInput.addEventListener("keydown", function(event) {
+
+            if (event.key === "Enter") {
+                enterChat();
+            }
+
+        });
+
+
+        /* =========================
+           ENVIAR MENSAJES
+        ========================== */
+
+        messageForm.addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            const text = messageInput.value.trim();
+
+            if (text === "") {
+                return;
+            }
+
+
+            const message = document.createElement("div");
+
+            message.classList.add("message");
+
+
+            const name = document.createElement("div");
+
+            name.classList.add("name");
+
+            name.textContent = username;
+
+
+            const messageText = document.createElement("div");
+
+            messageText.classList.add("text");
+
+            messageText.textContent = text;
+
+
+            const time = document.createElement("span");
+
+            time.classList.add("time");
+
+            const now = new Date();
+
+            time.textContent =
+                now.getHours().toString().padStart(2, "0")
+                + ":"
+                +
+                now.getMinutes().toString().padStart(2, "0");
+
+
+            message.appendChild(name);
+            message.appendChild(messageText);
+            message.appendChild(time);
+
+
+            messages.appendChild(message);
+
+
+            messageInput.value = "";
+
+            messageInput.focus();
+
+
+            messages.scrollTop = messages.scrollHeight;
+
+        });
+
+    </script>
+
+</body>
+</html>
+```
