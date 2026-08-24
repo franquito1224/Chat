@@ -1,97 +1,157 @@
-﻿
+```html
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Chat Privado</title>
 
+
+    <!-- Supabase -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
     <style>
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
+
         body {
-            font-family: Arial, Helvetica, sans-serif;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
             background: #101114;
+
             color: white;
+
             height: 100vh;
+
             overflow: hidden;
         }
 
+
         /* =========================
-           PANTALLA DE NOMBRE
+           PANTALLA DE ENTRADA
         ========================== */
 
         #login-screen {
+
             position: fixed;
+
             inset: 0;
 
             display: flex;
+
             justify-content: center;
+
             align-items: center;
 
             background:
-                radial-gradient(circle at top, #252936, #101114 60%);
+                radial-gradient(
+                    circle at top,
+                    #252936,
+                    #101114 60%
+                );
         }
 
+
         .login-box {
+
             width: min(90%, 400px);
+
             padding: 35px;
 
             background: #191b20;
+
             border: 1px solid #2d3038;
+
             border-radius: 18px;
 
             text-align: center;
 
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            box-shadow:
+                0 20px 60px
+                rgba(0, 0, 0, 0.4);
         }
 
+
         .login-box h1 {
+
             font-size: 30px;
+
             margin-bottom: 10px;
         }
 
+
         .login-box p {
+
             color: #aeb2bd;
+
             margin-bottom: 25px;
+
+            line-height: 1.5;
         }
 
+
         #username {
+
             width: 100%;
+
             padding: 14px 16px;
 
             background: #101114;
+
             color: white;
 
             border: 1px solid #343842;
+
             border-radius: 10px;
 
             outline: none;
+
             font-size: 16px;
 
             margin-bottom: 15px;
         }
 
+
         #username:focus {
+
             border-color: #666d7c;
         }
 
+
         #enter-button {
+
             width: 100%;
+
             padding: 14px;
 
             border: none;
+
             border-radius: 10px;
 
             background: white;
+
             color: #111;
 
             font-size: 16px;
+
             font-weight: bold;
 
             cursor: pointer;
@@ -99,8 +159,11 @@
             transition: 0.2s;
         }
 
+
         #enter-button:hover {
+
             transform: translateY(-2px);
+
             background: #e9e9e9;
         }
 
@@ -110,65 +173,91 @@
         ========================== */
 
         #chat-screen {
+
             display: none;
 
             height: 100vh;
+
             width: 100%;
 
             flex-direction: column;
         }
 
-        /* CABECERA */
 
         .chat-header {
+
             height: 65px;
 
             display: flex;
+
             align-items: center;
+
             justify-content: space-between;
 
             padding: 0 20px;
 
             background: #191b20;
+
             border-bottom: 1px solid #2d3038;
         }
 
+
         .chat-title {
+
             display: flex;
+
             align-items: center;
+
             gap: 10px;
         }
 
+
         .chat-icon {
+
             width: 38px;
+
             height: 38px;
 
             display: flex;
+
             align-items: center;
+
             justify-content: center;
 
             background: #292c34;
+
             border-radius: 50%;
         }
 
+
         .chat-title h2 {
+
             font-size: 18px;
         }
 
+
         .online {
+
             font-size: 12px;
+
             color: #8e949f;
         }
 
+
         #current-user {
+
             color: #c9ccd3;
+
             font-size: 14px;
         }
 
 
-        /* MENSAJES */
+        /* =========================
+           MENSAJES
+        ========================== */
 
         #messages {
+
             flex: 1;
 
             overflow-y: auto;
@@ -176,13 +265,17 @@
             padding: 20px;
 
             display: flex;
+
             flex-direction: column;
+
             gap: 10px;
 
             background: #101114;
         }
 
+
         .message {
+
             max-width: 75%;
 
             padding: 10px 14px;
@@ -194,8 +287,11 @@
             align-self: flex-start;
         }
 
+
         .message .name {
+
             font-size: 12px;
+
             font-weight: bold;
 
             color: #bfc3cc;
@@ -203,12 +299,21 @@
             margin-bottom: 4px;
         }
 
+
         .message .text {
+
             font-size: 15px;
+
             line-height: 1.4;
+
+            white-space: pre-wrap;
+
+            word-break: break-word;
         }
 
+
         .message .time {
+
             display: block;
 
             font-size: 10px;
@@ -219,27 +324,60 @@
         }
 
 
-        /* ZONA DE ESCRIBIR */
+        /* MENSAJE DEL SISTEMA */
+
+        .system-message {
+
+            align-self: center;
+
+            max-width: 90%;
+
+            text-align: center;
+
+            background: transparent;
+
+            color: #777c87;
+
+            padding: 8px;
+        }
+
+
+        .system-message .name {
+
+            color: #777c87;
+        }
+
+
+        /* =========================
+           CAJA DE MENSAJE
+        ========================== */
 
         .message-area {
+
             display: flex;
+
             gap: 10px;
 
             padding: 12px 15px;
 
             background: #191b20;
+
             border-top: 1px solid #2d3038;
         }
 
+
         #message-input {
+
             flex: 1;
 
             padding: 13px 15px;
 
             background: #101114;
+
             color: white;
 
             border: 1px solid #343842;
+
             border-radius: 10px;
 
             outline: none;
@@ -247,13 +385,17 @@
             font-size: 15px;
         }
 
+
         #send-button {
+
             width: 50px;
 
             border: none;
+
             border-radius: 10px;
 
             background: white;
+
             color: #111;
 
             font-size: 20px;
@@ -263,7 +405,9 @@
             transition: 0.2s;
         }
 
+
         #send-button:hover {
+
             transform: scale(1.05);
         }
 
@@ -275,32 +419,46 @@
         @media (max-width: 600px) {
 
             .login-box {
+
                 padding: 28px 22px;
             }
 
+
             .chat-header {
+
                 padding: 0 12px;
             }
 
+
             #messages {
+
                 padding: 12px;
             }
 
+
             .message {
+
                 max-width: 85%;
             }
 
+
             #current-user {
+
                 display: none;
             }
+
         }
+
     </style>
+
 </head>
+
 
 <body>
 
+
     <!-- =========================
-         PANTALLA PARA ELEGIR NOMBRE
+         ENTRADA
     ========================== -->
 
     <section id="login-screen">
@@ -310,8 +468,10 @@
             <h1>💬 Chat Privado</h1>
 
             <p>
-                Elige el nombre que aparecerá junto a tus mensajes.
+                Elige el nombre que aparecerá
+                junto a tus mensajes.
             </p>
+
 
             <input
                 type="text"
@@ -321,8 +481,11 @@
                 autocomplete="off"
             >
 
+
             <button id="enter-button">
+
                 Entrar al chat
+
             </button>
 
         </div>
@@ -330,13 +493,13 @@
     </section>
 
 
+
     <!-- =========================
-         PANTALLA DEL CHAT
+         CHAT
     ========================== -->
 
     <main id="chat-screen">
 
-        <!-- CABECERA -->
 
         <header class="chat-header">
 
@@ -346,45 +509,54 @@
                     💬
                 </div>
 
+
                 <div>
-                    <h2>Chat Privado</h2>
+
+                    <h2>
+                        Chat Privado
+                    </h2>
 
                     <span class="online">
                         Chat grupal
                     </span>
+
                 </div>
 
             </div>
+
 
             <div id="current-user"></div>
 
         </header>
 
 
-        <!-- =========================
-     MENSAJES
-========================= -->
 
-<section id="messages">
+        <!-- MENSAJES -->
 
-    <div class="message system-message">
+        <section id="messages">
 
-        <div class="name">
-            💬 Sistema
-        </div>
+            <div class="message system-message">
 
-        <div class="text">
-            Bienvenido al chat 👋
-        </div>
+                <div class="name">
+                    💬 Sistema
+                </div>
 
-    </div>
+                <div class="text">
+                    Bienvenido al chat 👋
+                </div>
 
-</section>
+            </div>
+
+        </section>
 
 
-        <!-- CAJA PARA ESCRIBIR -->
 
-        <form class="message-area" id="message-form">
+        <!-- ESCRIBIR -->
+
+        <form
+            class="message-area"
+            id="message-form"
+        >
 
             <input
                 type="text"
@@ -392,6 +564,7 @@
                 placeholder="Escribe un mensaje..."
                 autocomplete="off"
             >
+
 
             <button
                 type="submit"
@@ -403,7 +576,9 @@
 
         </form>
 
+
     </main>
+
 
 
     <!-- =========================
@@ -412,124 +587,452 @@
 
     <script>
 
-        const loginScreen = document.getElementById("login-screen");
-        const chatScreen = document.getElementById("chat-screen");
 
-        const usernameInput = document.getElementById("username");
-        const enterButton = document.getElementById("enter-button");
+        /* =====================================
+           CONFIGURACIÓN DE SUPABASE
+        ====================================== */
 
-        const currentUser = document.getElementById("current-user");
+        const SUPABASE_URL =
+            "https://gbjxznnjcsfunxdunrui.supabase.co";
 
-        const messageForm = document.getElementById("message-form");
-        const messageInput = document.getElementById("message-input");
-        const messages = document.getElementById("messages");
 
+        /*
+           PEGA AQUÍ TU PUBLISHABLE KEY
+
+           Ejemplo:
+
+           const SUPABASE_KEY =
+               "sb_publishable_XXXXXXXX";
+        */
+
+        const SUPABASE_KEY =
+            "sb_publishable_CI7pM-3N3Av_Gb3y6y0xsw_24NrAZqY";
+
+
+        const supabaseClient =
+            window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_KEY
+            );
+
+
+
+        /* =====================================
+           ELEMENTOS
+        ====================================== */
+
+        const loginScreen =
+            document.getElementById(
+                "login-screen"
+            );
+
+
+        const chatScreen =
+            document.getElementById(
+                "chat-screen"
+            );
+
+
+        const usernameInput =
+            document.getElementById(
+                "username"
+            );
+
+
+        const enterButton =
+            document.getElementById(
+                "enter-button"
+            );
+
+
+        const currentUser =
+            document.getElementById(
+                "current-user"
+            );
+
+
+        const messageForm =
+            document.getElementById(
+                "message-form"
+            );
+
+
+        const messageInput =
+            document.getElementById(
+                "message-input"
+            );
+
+
+        const messages =
+            document.getElementById(
+                "messages"
+            );
+
+
+
+        /* =====================================
+           DATOS DEL CHAT
+        ====================================== */
 
         let username = "";
 
 
-        /* =========================
-           ENTRAR AL CHAT
-        ========================== */
+        /*
+           El chat se identifica mediante:
 
-        function enterChat() {
+           ?chat=abc123
 
-            const name = usernameInput.value.trim();
+           Si no existe, usamos "general".
+        */
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const chatId =
+            params.get("chat") || "general";
+
+
+
+        /* =====================================
+           ENTRAR
+        ====================================== */
+
+        async function enterChat() {
+
+
+            const name =
+                usernameInput.value.trim();
+
 
             if (name === "") {
+
                 usernameInput.focus();
+
                 return;
+
             }
+
 
             username = name;
 
-            currentUser.textContent = "👤 " + username;
 
-            loginScreen.style.display = "none";
-            chatScreen.style.display = "flex";
+            currentUser.textContent =
+                "👤 " + username;
+
+
+            loginScreen.style.display =
+                "none";
+
+
+            chatScreen.style.display =
+                "flex";
+
+
+            await loadMessages();
+
+
+            subscribeToMessages();
+
 
             messageInput.focus();
+
         }
 
 
-        enterButton.addEventListener("click", enterChat);
+
+        enterButton.addEventListener(
+            "click",
+            enterChat
+        );
 
 
-        usernameInput.addEventListener("keydown", function(event) {
 
-            if (event.key === "Enter") {
-                enterChat();
+        usernameInput.addEventListener(
+            "keydown",
+            function(event) {
+
+                if (event.key === "Enter") {
+
+                    enterChat();
+
+                }
+
             }
+        );
 
-        });
 
 
-        /* =========================
-           ENVIAR MENSAJES
-        ========================== */
+        /* =====================================
+           CARGAR MENSAJES
+        ====================================== */
 
-        messageForm.addEventListener("submit", function(event) {
+        async function loadMessages() {
 
-            event.preventDefault();
 
-            const text = messageInput.value.trim();
+            const {
+                data,
+                error
+            } = await supabaseClient
 
-            if (text === "") {
+                .from("messages")
+
+                .select("*")
+
+                .eq("chat_id", chatId)
+
+                .order(
+                    "created_at",
+                    {
+                        ascending: true
+                    }
+                );
+
+
+            if (error) {
+
+                console.error(
+                    "Error cargando mensajes:",
+                    error
+                );
+
                 return;
+
             }
 
 
-            const message = document.createElement("div");
-
-            message.classList.add("message");
-
-
-            const name = document.createElement("div");
-
-            name.classList.add("name");
-
-            name.textContent = username;
+            data.forEach(
+                addMessageToScreen
+            );
 
 
-            const messageText = document.createElement("div");
+            scrollToBottom();
 
-            messageText.classList.add("text");
-
-            messageText.textContent = text;
+        }
 
 
-            const time = document.createElement("span");
 
-            time.classList.add("time");
+        /* =====================================
+           MOSTRAR MENSAJE
+        ====================================== */
 
-            const now = new Date();
+        function addMessageToScreen(
+            message
+        ) {
+
+
+            const element =
+                document.createElement(
+                    "div"
+                );
+
+
+            element.classList.add(
+                "message"
+            );
+
+
+            const name =
+                document.createElement(
+                    "div"
+                );
+
+
+            name.classList.add(
+                "name"
+            );
+
+
+            name.textContent =
+                message.username;
+
+
+            const text =
+                document.createElement(
+                    "div"
+                );
+
+
+            text.classList.add(
+                "text"
+            );
+
+
+            text.textContent =
+                message.message;
+
+
+            const time =
+                document.createElement(
+                    "span"
+                );
+
+
+            time.classList.add(
+                "time"
+            );
+
+
+            const date =
+                new Date(
+                    message.created_at
+                );
+
 
             time.textContent =
-                now.getHours().toString().padStart(2, "0")
-                + ":"
-                +
-                now.getMinutes().toString().padStart(2, "0");
+                date.toLocaleTimeString(
+                    [],
+                    {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    }
+                );
 
 
-            message.appendChild(name);
-            message.appendChild(messageText);
-            message.appendChild(time);
+            element.appendChild(name);
+
+            element.appendChild(text);
+
+            element.appendChild(time);
 
 
-            messages.appendChild(message);
+            messages.appendChild(
+                element
+            );
 
 
-            messageInput.value = "";
+            scrollToBottom();
 
-            messageInput.focus();
+        }
 
 
-            messages.scrollTop = messages.scrollHeight;
 
-        });
+        /* =====================================
+           ENVIAR MENSAJE
+        ====================================== */
+
+        messageForm.addEventListener(
+            "submit",
+            async function(event) {
+
+
+                event.preventDefault();
+
+
+                const text =
+                    messageInput.value.trim();
+
+
+                if (text === "") {
+
+                    return;
+
+                }
+
+
+                const {
+                    error
+                } = await supabaseClient
+
+                    .from("messages")
+
+                    .insert({
+
+                        chat_id: chatId,
+
+                        username: username,
+
+                        message: text
+
+                    });
+
+
+                if (error) {
+
+                    console.error(
+                        "Error enviando mensaje:",
+                        error
+                    );
+
+                    alert(
+                        "No se pudo enviar el mensaje."
+                    );
+
+                    return;
+
+                }
+
+
+                messageInput.value = "";
+
+                messageInput.focus();
+
+            }
+        );
+
+
+
+        /* =====================================
+           TIEMPO REAL
+        ====================================== */
+
+        function subscribeToMessages() {
+
+
+            supabaseClient
+
+                .channel(
+                    "chat-" + chatId
+                )
+
+                .on(
+                    "postgres_changes",
+                    {
+                        event: "INSERT",
+
+                        schema: "public",
+
+                        table: "messages",
+
+                        filter:
+                            "chat_id=eq." +
+                            chatId
+                    },
+
+                    function(payload) {
+
+                        addMessageToScreen(
+                            payload.new
+                        );
+
+                    }
+
+                )
+
+                .subscribe();
+
+        }
+
+
+
+        /* =====================================
+           SCROLL
+        ====================================== */
+
+        function scrollToBottom() {
+
+            messages.scrollTop =
+                messages.scrollHeight;
+
+        }
+
 
     </script>
 
+
 </body>
+
 </html>
 ```
